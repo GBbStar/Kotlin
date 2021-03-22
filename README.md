@@ -471,7 +471,232 @@
 
 
 
+<details>
+  <summary> 느낀점 </summary>
+    
+  <details>
+    <summary> -- </summary>
+  
+  * 코틀린
+    - null safety
+      코틀린은 자바와 완벽하게 호환하기 때문에, 코틀린에서 null safety 정책이 존재한다.
+      ~~~
+        자바에는 null이 올 수 있기 때문에 ?, !를 통해 언급해주는 것
+      ~~~
+      + lateinit
+        ~~~
+          var nullalbeNumber:Int? = null
+          
+          lateinit var lateinitNumber:Int
+          
+          lateinitNumber = 10
+          
+          사용시
+          nullableNumber?.add()
+          lateinitNumber.add()
+        ~~~
+      + lazy init
+        ~~~
+          val lazyNumber :Int by lazy {
+              100
+          }
+          > 사용하기 전까지 할당되지 않음
+          
+          lazyNumber.add()
+          > 사용함으로써, 100이 할당됨
+        ~~~
+  
+    - Function Expression
+      코틀린에서 함수를 좀더 편리하게 표현하는 방식이 존재한다.
+      ~~~
+        fun sum (a:Int, b:Int):Int {
+            return a+b
+        }
+        
+        ==
+        
+        fun sum (a:Int, b:Int) = a + b
+        
+        다음과 같이 사용할 수도 있다
+        fun max(a:Int, b:Int) = if(a>b) a else b
+      ~~~
+      
+  * 단축키(reformat code)
+    
+    코드 순서를 일관성있게 정리해줌
+    ~~~
+      Ctrl + Alt + L
+    ~~~
+  
+  * 조건문
+    
+    - when
+      when 파라미터의 조건식으로 자료형을 판단할 수 있음
+      
+      ~~~
+        when(x) {
+            is Int -> ~~~
+            else -> ~~~
+        }
+      ~~~
+  
+  * Scope Function
+    - apply
+      자바와 비교하여 이해하기
+      ~~~
+        val person = Person().apply{
+            firstName = "Fast"
+            lastName = "Campus"
+        }
+        
+        Person person = new Person();
+        person.firstName = "Fast";
+        person.lastName = "Campus";
+        
+        보통 초기화할 때 사용
+      ~~~
+    
+    - with
+      자바와 비교하여 이해하기
+      ~~~
+        val person = Person()
+        
+        with(person){
+            work()
+            sleep()
+            println(age)
+        }
+        
+        -------------------------
+        
+        Person person = new Person();
+        
+        person.work();
+        person.sleep();
+        System.out.print(person.age);
+        
+        하나의 객체를 중점으로 한번에 수행할 함수들을 묶음
+      ~~~
+    
+    - let
+      자바와 비교하여 이해하기
+      ~~~
+        #1
+        val number:Int?
+        
+        val sumNumberStr = number?.let {
+            "${sum(10, it}"
+        }
+        
+        #2
+        val number:Int?
+        
+        val sumNumberStr = number?.let {
+            "${sum(10, it}"
+        }.orEmpty()
+        -----------------------------------
+        #1
+        Integer number = null;
+        String sumNumberStr = null;
+        
+        if(number != null) {
+            sumNumber = ""+sum(10,number);
+        }
+        
+        #2
+        Integer number = null;
+        String sumNumberStr = null;
+        
+        if(number != null) {
+            sumNumber = ""+sum(10,number);
+        } else {
+            sumNumber = "";
+        }
+      ~~~
+    
+    - also
+      자바와 비교하여 이해하기
+      ~~~
+        Random.nextInt(100).also {
+            print("getRandomInt() is $it")
+        }
+        
+        int value = Random().nextInt(100);
+        System.out.print(value);
+        
+        다수의 동작을 하나로 묶어서 수행시킬 수 있다
+      ~~~
+      
+    - run
+      자바와 비교하여 이해하기
+      ~~~
+        val result = service.run {
+            port = 8080
+            query()
+        }
+        
+        -----------------------------
+        
+        service.port = 8080;
+        Result result = service.query();
+        
+        with와 다르게 하나의 객체를 중점으로 수행하지 않음
+      ~~~
+  
+  * 텍스트 처리
 
+    하나하나 타이핑해서 넣기보다 values의 string을 이용해서 코딩하면, 하나를 수정하면 전체가 반영되기에 유지보수에 유리하다
+    ~~~
+      <Button
+          android:id="@+id/clearButton"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="@string/clear"
+    ~~~
+  
+  * findViewById()
+    
+    과거 코틀린은 익스텐션을 통해 findViewById를 생략할 수 있도록 해줬으나, 익스텐션에 에러가 많아서 지원 안하게 됨
+    ~~~
+      val heightEditText: EditText = findViewById(R.id.heightEditText)
+      val weightEditText = findViewById<EditText>(R.id.weightEditText)
+    ~~~
+    
+  * 액티비티 추가
+  
+    액티비티를 추가할 때마다 매니페스트에 추가해야됨
+    ~~~
+      <activity android:name=".ResultActivity"/>
+    ~~~
+    
+    
+  * 예외처리
+    
+    리스너 안에서 예외처리를 할 때 return 값으로 해당 리스너를 반환해줌으로써, 어디에서 예외가 났는지 알 수 있게 해줌
+    
+    ~~~
+       resultButton.setOnClickListener {
+
+            if (heightEditText.text.isEmpty() || weightEditText.text.isEmpty()) {
+                Toast.makeText(this, "빈 값이 있습니다.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+    ~~~
+    
+  * 인텐트
+  
+    전달받은 intent를 받을 때, 별도의 getIntent()없이 바로 사용할 수 있음
+    
+    ~~~
+      override fun onCreate(savedInstanceState: Bundle?) {
+          super.onCreate(savedInstanceState)
+          setContentView(R.layout.activity_result)
+
+          val height = intent.getIntExtra("height", 0)
+          val weight = intent.getIntExtra("weight", 0)
+    ~~~
+  </details>
+</details>
 
 
 
