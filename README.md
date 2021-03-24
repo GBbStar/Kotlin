@@ -520,7 +520,26 @@
         다음과 같이 사용할 수도 있다
         fun max(a:Int, b:Int) = if(a>b) a else b
       ~~~
-      
+  
+  * 레이아웃
+    - Constraint 레이아웃
+      + 0dp를 주고 제약조건을 걸면 match처럼 양쪽이 최대로 늘어난다
+      + 가중치를 주는 방법에는 제약조건 constraint 중 weight에 관련된 속성을 이용하는 법이 있다       
+      ~~~
+      <View
+        android:id="@+id/topLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/keypadTableLayout"
+        app:layout_constraintVertical_weight="1" />
+      ~~~
+  * xml
+    - ripple
+      + 안드로이드 머터리얼 테마에서 지원하는 그리기 효과. 눌렀을때 물결처럼 촥 퍼지는 효과를 가지고 있음
+      + ripple에서 color 속성은 눌렀을 떄 색이고, background는 item 태그를 통해 다시 설정해줘야 함     
   * 단축키(reformat code)
     
     코드 순서를 일관성있게 정리해줌
@@ -695,6 +714,101 @@
           val height = intent.getIntExtra("height", 0)
           val weight = intent.getIntExtra("weight", 0)
     ~~~
+    
+  * theme (in values)
+    - 해당 프로젝트에 들어가는 위젯들의 기본적인 색이나 모양들을 미리 선언해둔 것
+    - 영향을 받지 않으려면 theme에서 설정해주거나, Appcompat 접두어가 붙은 위젯들을 사용한다
+    - theme에서 NoActionBar를 설정해주고, 메니페스트에서 해당값을 사용하면 앱의 상단 액션바가 없어진다
+      ~~~
+            <style name="AppTheme.NoActionBar" parent="Theme.MaterialComponents.DayNight.NoActionBar"/>
+          
+            <activity android:name=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+      ~~~
+  
+  * getSharedPreferences
+    - getSharedPreferences도 Map처럼 객체 이름, 키와 밸류로 이루어져 있다.
+    - getSharedPreferences에서 해당 파일을 다른 앱과 공유하고 싶지 않을 떈 private으로 설정해주면 된다.
+      ~~~
+          val sharedPreferences = getSharedPreferences("password", Context.MODE_PRIVATE)
+      ~~~
+  
+  * 람다식
+    - 람다식을 넘길 때 보통 인자가 1개일때는 생략할 수 있으나, 2개 이상인 경우 명시가 필요하다.
+    - 2개 이상의 인자가 요구되지만, 사용되지 않는다면 언더바로 바꿔서 넘길 수 있다
+      ~~~
+        private fun showErrorPopup() {
+        AlertDialog.Builder(this)
+            .setTitle("실패")
+            .setMessage("비밀번호가 잘못되었습니다.")
+            .setPositiveButton("확인") {dialog, which -> ~~~~ }
+            .create()
+            .show()
+        }
+        
+        private fun showErrorPopup() {
+        AlertDialog.Builder(this)
+            .setTitle("실패")
+            .setMessage("비밀번호가 잘못되었습니다.")
+            .setPositiveButton("확인") { _, _ -> }
+            .create()
+            .show()
+        }
+      ~~~
+      
+  * 초기화
+    - onCreate 함수는 앱의 화면이 다 그려진 이후에 호출된다.
+    - 따라서 앱에 기본적으로 보여줘야 하는 경우 선언과 함께 초기화 해주어야 한다.
+      ~~~
+            private val firstNumberPicker: NumberPicker by lazy {
+            findViewById<NumberPicker>(R.id.firstNumberPicker)
+                .apply {
+                    minValue = 0
+                    maxValue = 9
+                }
+            }
+            
+            override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            setContentView(R.layout.activity_main)
+
+            initNumberPicker()
+            initOpenButton()
+            initChangePasswordButton()
+            }
+
+            private fun initNumberPicker() {
+                firstNumberPicker
+                secondNumberPicker
+                thirdNumberPicker
+            }
+      ~~~
+      
+  * Thread
+    - DB와 상호작용할때 쓰레드를 이용하는 것은 
+    - UI와 상호작용
+      + UI와 상호작용하기 위해선 메인 쓰레드를 사용해야 하는데, 이를 연결해주는 것을 핸들러가 수행해준다
+      ~~~
+        private val handler = Handler(Looper.getMainLooper())
+      ~~~
+    - removeCallback
+      + removeCallback을 통해 이전에 수행되지 않은 러너블이 존재한다면 지워준다
+      ~~~
+            diaryEditText.addTextChangedListener {
+                Log.d("DiaryActivity", "text Changed :: $it")
+                handler.removeCallbacks(runnable)
+                handler.postDelayed(runnable, 500)
+            }
+      ~~~
+    - postDelay   
+      + postDelay는 변화가 일어난 시점에 바로 수행하는 것이 아닌, 주어진 시간동안 관찰하여 추가적인 이벤트가 나타나지 않을 경우 수행함을 의미
+      ~~~
+            diaryEditText.addTextChangedListener {
+                Log.d("DiaryActivity", "text Changed :: $it")
+                handler.removeCallbacks(runnable)
+                handler.postDelayed(runnable, 500)
+            }
+      ~~~         
   </details>
 </details>
 
