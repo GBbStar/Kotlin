@@ -77,10 +77,26 @@
     + 상수 : 한 번 입력된 값은 변경할 수 없고, 기준이 되는 변하지 않는 값을 미리 입력할 때 사용
     + 선언 및 사용방법은 변수와 동일하다.
 
-  - 문자열 템플릿
+  - String 템플릿
     + 더하기 연산으로 2개의 문자를 하나로 합칠 수 있다. 
     + 문자열 내부에서 $기호를 넣으면 해당 영역이 문자가 아닌 코드라는 것을 알려줌(뒤에 공백)
     + 문자열 내부에서 {}와 $를 사용하여 추가적인 수식을 입력할 수도   
+    + dropLast를 사용하면 끝 한단어가 삭제됨
+    + Spannable을 통해 텍스트의 '일부' 에만 색을 입히거나, 크기를 늘리거나 등등 효과를 넣을 수 있게 해줌
+      + 입력받았을때 기준 뒤에 한자리가 연산자이기에 이렇게 설정
+      + 마지막 요소는 앞뒤로 색을 더 적용할 것인가 의미
+      ~~~
+        val ssb = SpannableStringBuilder(expressionTextView.text)
+        ssb.setSpan(
+            ForegroundColorSpan(getColor(R.color.green)),
+            expressionTextView.text.length - 1,
+            expressionTextView.text.length,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+      ~~~
+      
+  - BigInteger
+  -    
   </details>
 
 
@@ -271,7 +287,22 @@
 
   <details>
     <summary> 함수 </summary>
-    <br/>  
+    <br/>
+  
+  * 리턴
+    - try catch를 이용한 반환
+      + 이것처럼 try catch를 이용한 결과도 가능
+      + 이때 BigInteger는 범위가 방대한 인티저임
+    ~~~
+      fun String.isNumber(): Boolean {
+          return try {
+              this.toBigInteger()
+              true
+          } catch (e: NumberFormatException) {
+              false
+          }
+      }
+    ~~~
   </details>
 
 
@@ -471,6 +502,141 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+  <details>
+    <summary> DB </summary>
+    <br/>  
+  
+  * DB 사용하기
+    - 앱 그래들 추가
+      + 플러그인
+        ~~~
+          plugins {
+              id 'com.android.application'
+              id 'kotlin-android'
+              id 'kotlin-kapt'
+          }
+        ~~~
+      + 라이브러리(defendencies)
+        ~~~
+             kapt "androidx.room:room-compiler:2.2.6"     
+             implementation "androidx.room:room-runtime:2.2.6"
+        ~~~
+    - DB 엔티티 모델(테이블) 선언
+      ~~~
+        package fastcampus.aop.part2.chapter4.model
+
+        import androidx.room.ColumnInfo
+        import androidx.room.Entity
+        import androidx.room.PrimaryKey
+
+        @Entity
+        data class History(
+            @PrimaryKey val uid: Int?,
+            @ColumnInfo(name = "expression") val expression: String?,
+            @ColumnInfo(name = "result") val result: String?
+        )
+      ~~~
+    - 테이블 조작 방식 정의(인터페이스)
+      ~~~
+        package fastcampus.aop.part2.chapter4.dao
+
+        import androidx.room.Dao
+        import androidx.room.Delete
+        import androidx.room.Insert
+        import androidx.room.Query
+        import fastcampus.aop.part2.chapter4.model.History
+
+        @Dao
+        interface HistoryDao {
+
+            @Query("SELECT * FROM history")
+            fun getAll(): List<History>
+
+            @Insert
+            fun insertHistory(history: History)
+
+            @Query("DELETE FROM history")
+            fun deleteAll()
+
+        //    @Delete
+        //    fun delete(history: History)
+        //
+        //    @Query("SELECT * FROM history Where result LIKE :result LIMIT 1")
+        //    fun findByResult(result: String):History
+        }
+      ~~~
+    - 실제 클래스로써 이용할 수 있게 추상 클래스로 생성
+      ~~~
+        package fastcampus.aop.part2.chapter4
+
+        import androidx.room.Database
+        import androidx.room.RoomDatabase
+        import fastcampus.aop.part2.chapter4.dao.HistoryDao
+        import fastcampus.aop.part2.chapter4.model.History
+
+        @Database(entities = [History::class], version = 1)
+        abstract class AppDatabase : RoomDatabase() {
+            abstract fun historyDao(): HistoryDao
+        }
+      ~~~
+    - 사용
+      + 선언
+        ~~~
+          lateinit var db: AppDatabase
+        ~~~
+      + onCreate
+        ~~~
+          db = Room.databaseBuilder(
+            applicationContext,
+            AppDatabase::class.java,
+            "historyDB"
+          ).build()
+        ~~~
+      + DB 조작  
+        ~~~
+          Thread(Runnable {
+              db.historyDao().insertHistory(History(null, expressionText, resultText))
+          }).start()
+          
+          
+          Thread(Runnable {
+              db.historyDao().getAll().reversed().forEach {
+                  runOnUiThread {
+                      val historyView = LayoutInflater.from(this).inflate(R.layout.history_row, null, false)
+                      historyView.findViewById<TextView>(R.id.expressionTextView).text = it.expression
+                      historyView.findViewById<TextView>(R.id.resultTextView).text = "= ${it.result}"
+
+                      historyLinearLayout.addView(historyView)
+                  }
+              }
+        }).start()
+        ~~~
+  </details>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <details>
   <summary> 느낀점 </summary>
     
@@ -536,10 +702,53 @@
         app:layout_constraintBottom_toTopOf="@id/keypadTableLayout"
         app:layout_constraintVertical_weight="1" />
       ~~~
+    - Linear 레이아웃
+      + removeAllViews()을 사용하면 해당 Linear에 있는 모든 뷰가 삭제됨
+
+
   * xml
     - ripple
       + 안드로이드 머터리얼 테마에서 지원하는 그리기 효과. 눌렀을때 물결처럼 촥 퍼지는 효과를 가지고 있음
       + ripple에서 color 속성은 눌렀을 떄 색이고, background는 item 태그를 통해 다시 설정해줘야 함     
+      ~~~
+        <ripple xmlns:android="http://schemas.android.com/apk/res/android"
+            android:color="@color/buttonPressGray">
+
+            <item android:id="@android:id/background">
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/buttonGray" />
+                    <corners android:radius="100dp" />
+                    <stroke
+                        android:width="1dp"
+                        android:color="@color/buttonPressGray" />
+                </shape>
+            </item>
+        </ripple>
+      ~~~
+    - 안드로이드 네임스페이스가 추가되어있지 않다면, android:color에 오류가 뜸
+    
+    - rentangle(다른 도형도 마찬가지)
+      + 라운드 효과를 주고자 한다면 corner 속성을 추가하면 된다
+      + shape 안에 solid 속성을 넣어야 색이 칠해짐
+      + stroke 속성이 태두리를 설정함
+        ~~~
+          <ripple xmlns:android="http://schemas.android.com/apk/res/android"
+              android:color="@color/buttonPressGray">
+
+              <item android:id="@android:id/background">
+                  <shape android:shape="rectangle">
+                      <solid android:color="@color/buttonGray" />
+                      <corners android:radius="100dp" />
+                      <stroke
+                          android:width="1dp"
+                          android:color="@color/buttonPressGray" />
+                  </shape>
+              </item>
+          </ripple>
+        ~~~
+    
+    - stateListAnimator에 "@null"을 넣어 기본적으로 적용중인 애니메이션을 취소할 수 있음
+    - 
   * 단축키(reformat code)
     
     코드 순서를 일관성있게 정리해줌
@@ -785,7 +994,8 @@
       ~~~
       
   * Thread
-    - DB와 상호작용할때 쓰레드를 이용하는 것은 
+    - DB와 상호작용할때 쓰레드를 이용하는 것은 필수
+    
     - UI와 상호작용
       + UI와 상호작용하기 위해선 메인 쓰레드를 사용해야 하는데, 이를 연결해주는 것을 핸들러가 수행해준다
       ~~~
