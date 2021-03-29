@@ -639,9 +639,6 @@
 
 <details>
   <summary> 느낀점 </summary>
-    
-  <details>
-    <summary> -- </summary>
   
   * 코틀린
     - null safety
@@ -687,6 +684,19 @@
         fun max(a:Int, b:Int) = if(a>b) a else b
       ~~~
   
+    - 화면 가로로 하기
+      + 매니페스트에서 가로로 설정할 수 있음
+      ~~~
+        <activity android:name=".PhotoFrameActivity"
+            android:screenOrientation="landscape"
+            />
+      ~~~
+  
+  
+  
+  
+  
+  
   * 레이아웃
     - Constraint 레이아웃
       + 0dp를 주고 제약조건을 걸면 match처럼 양쪽이 최대로 늘어난다
@@ -704,9 +714,42 @@
       ~~~
     - Linear 레이아웃
       + removeAllViews()을 사용하면 해당 Linear에 있는 모든 뷰가 삭제됨
-
+      + Linear에서 높이를 0으로 하고 가로와 세로간의 비율로 주는 설정하는 방법
+        ~~~
+            <LinearLayout
+                android:id="@+id/firstRowLinearLayout"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintDimensionRatio="H,3:1">
+        ~~~
 
   * xml
+    - xml에서 겹친 뷰들은 뒤쪽에 온게 더 앞쪽에 옴
+    - ImageView
+      + 이미지를 조절하는 방법을 설정하는 속성 : scaleType
+        ~~~
+        <ImageView
+            android:id="@+id/imageView11"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:scaleType="centerCrop" />
+        ~~~
+      + URL로 이미지 설정
+        ~~~
+          photoImageView.setImageURI(photoList[next])
+        ~~~
+      + 애니메이션 주기
+        ~~~
+          photoImageView.animate()
+            .alpha(1.0f)
+            .setDuration(1000)
+            .start()
+        ~~~
+        
     - ripple
       + 안드로이드 머터리얼 테마에서 지원하는 그리기 효과. 눌렀을때 물결처럼 촥 퍼지는 효과를 가지고 있음
       + ripple에서 color 속성은 눌렀을 떄 색이고, background는 item 태그를 통해 다시 설정해줘야 함     
@@ -749,12 +792,23 @@
     
     - stateListAnimator에 "@null"을 넣어 기본적으로 적용중인 애니메이션을 취소할 수 있음
     - 
+  
+  
+  
+  
+  
+  
   * 단축키(reformat code)
     
     코드 순서를 일관성있게 정리해줌
     ~~~
       Ctrl + Alt + L
     ~~~
+  
+  
+  
+  
+  
   
   * 조건문
     
@@ -767,6 +821,14 @@
             else -> ~~~
         }
       ~~~
+  
+  
+  
+  
+  
+  
+  
+  
   
   * Scope Function
     - apply
@@ -897,7 +959,14 @@
       <activity android:name=".ResultActivity"/>
     ~~~
     
-    
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
   * 예외처리
     
     리스너 안에서 예외처리를 할 때 return 값으로 해당 리스너를 반환해줌으로써, 어디에서 예외가 났는지 알 수 있게 해줌
@@ -911,6 +980,15 @@
             }
     ~~~
     
+  
+  
+  
+  
+  
+  
+  
+  
+  
   * 인텐트
   
     전달받은 intent를 받을 때, 별도의 getIntent()없이 바로 사용할 수 있음
@@ -924,6 +1002,14 @@
           val weight = intent.getIntExtra("weight", 0)
     ~~~
     
+
+
+
+
+
+
+
+
   * theme (in values)
     - 해당 프로젝트에 들어가는 위젯들의 기본적인 색이나 모양들을 미리 선언해둔 것
     - 영향을 받지 않으려면 theme에서 설정해주거나, Appcompat 접두어가 붙은 위젯들을 사용한다
@@ -935,12 +1021,24 @@
             android:theme="@style/AppTheme.NoActionBar">
       ~~~
   
+ 
+ 
+ 
+ 
   * getSharedPreferences
     - getSharedPreferences도 Map처럼 객체 이름, 키와 밸류로 이루어져 있다.
     - getSharedPreferences에서 해당 파일을 다른 앱과 공유하고 싶지 않을 떈 private으로 설정해주면 된다.
       ~~~
           val sharedPreferences = getSharedPreferences("password", Context.MODE_PRIVATE)
       ~~~
+  
+  
+  
+  
+  
+  
+  
+  
   
   * 람다식
     - 람다식을 넘길 때 보통 인자가 1개일때는 생략할 수 있으나, 2개 이상인 경우 명시가 필요하다.
@@ -965,6 +1063,16 @@
         }
       ~~~
       
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   * 초기화
     - onCreate 함수는 앱의 화면이 다 그려진 이후에 호출된다.
     - 따라서 앱에 기본적으로 보여줘야 하는 경우 선언과 함께 초기화 해주어야 한다.
@@ -993,6 +1101,18 @@
             }
       ~~~
       
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   * Thread
     - DB와 상호작용할때 쓰레드를 이용하는 것은 필수
     
@@ -1019,7 +1139,128 @@
                 handler.postDelayed(runnable, 500)
             }
       ~~~         
-  </details>
+    - 타이머로써 활용
+      ~~~
+            timer = timer(period = 5 * 1000) {
+            runOnUiThread {
+                Log.d("PhotoFrame", "5초가 지나감 !!")
+
+                val current = currentPosition
+                val next = if (photoList.size <= currentPosition + 1) 0 else currentPosition + 1
+
+                backgroundPhotoImageView.setImageURI(photoList[current])
+
+                photoImageView.alpha = 0f
+                photoImageView.setImageURI(photoList[next])
+                photoImageView.animate()
+                    .alpha(1.0f)
+                    .setDuration(1000)
+                    .start()
+
+                currentPosition = next
+            }
+
+        }
+      ~~~ 
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  * 권한 
+    - 권한 부여 확인하기
+      ~~~
+            when {
+                ContextCompat.checkSelfPermission(this,android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED -> {
+                    navigatePhotos()
+                }
+                shouldShowRequestPermissionRationale(android.Manifest.permission.READ_EXTERNAL_STORAGE) -> {
+                    showPermissionContextPopup()
+                }
+                else -> {
+                    requestPermissions(arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE), 1000)
+                }
+            }
+      ~~~
+      + android.Manifest.permission.READ_EXTERNAL_STORAGE이 부여 되어 있으면 PackageManager.PERMISSION_GRANTED가 아니면 DENIED를 반환함
+      + cntl 눌러서 들어가보면 함수 설명 및 리턴이 무엇인지 잘 적혀있음
+      + shouldShowRequestPermissionRationale은 인자로온 권한이 교육용 확인을 위한 팝업을 띄워야(필요한 것인지) 하는 건지를 알려줌
+      + requestPermissions(arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE), 1000)은 권한(들)을 요청하는 것, 1000은 리퀘스트 코드임(추후 result 에서 구분하기 위한 키값)
+      + 교육용 확인을 위한 팝업을 띄울 때 나만의 방식으로 넣는 것
+        ~~~
+          private fun showPermissionContextPopup() {
+              AlertDialog.Builder(this)
+                  .setTitle("권한이 필요합니다.")
+                  .setMessage("전자액자에 앱에서 사진을 불러오기 위해 권한이 필요합니다.")
+                  .setPositiveButton("동의하기") { _, _ ->
+                      requestPermissions(arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE), 1000)
+                  }
+                  .setNegativeButton("취소하기") { _, _ -> }
+                  .create()
+                  .show()
+
+          }
+        ~~~
+    - 권한 승인 확인
+      + 권한이 승인 된건지 아닌지는 onRequestPermmsionsResult에서 처리 
+        ~~~
+            override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+                when (requestCode) {
+                    1000 -> {
+                        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                            navigatePhotos()
+
+                        } else {
+                            Toast.makeText(this, "권한을 거부하셨습니다.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    else -> {
+                        //
+                    }
+                }
+              }
+        ~~~
+  
+  
+  
+  
+  
+  
+  
+  * 이미지 다루기
+    - 프로바이더 생성 (이미지 가져오기) : SAF(stroage access framework)
+      ~~~
+        val intent = Intent(Intent.ACTION_GET_CONTENT)
+        intent.type = "image/*"
+      ~~~
+      
+    - 이미지를 uri로 다루기
+      ~~~
+            private val imageUriList: MutableList<Uri> = mutableListOf()
+            val intent = Intent(this, PhotoFrameActivity::class.java)
+            imageUriList.forEachIndexed { index, uri ->
+                intent.putExtra("photo$index", uri.toString())
+            }
+
+            private fun getPhotoUriFromIntent() {
+                val size = intent.getIntExtra("photoListSize", 0)
+                for (i in 0..size) {
+                    intent.getStringExtra("photo$i")?.let {
+                        photoList.add(Uri.parse(it))
+                    }
+                }
+            }
+      ~~~
+  
 </details>
 
 
