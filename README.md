@@ -2314,3 +2314,92 @@ override fun onPageFinished(view: WebView?, url: String?) {
 [황규빈] [오후 8:40]             val sharedPreferences = getSharedPreferences("password", Context.MODE_PRIVATE)
 [황규빈] [오후 8:48] return@setOnClickListener
 [황규빈] [오후 9:21]     private val handler = Handler(Looper.getMainLooper())
+
+! 텍스트간 수평 정렬할 때 사용(높이 조절(
+app:layout_constraintBaseline_toBaselineOf="@id/minuteTextView"
+
+
+? 언제 ontick, onfinish가 불리는지
+    private fun createTimer(initialMillis: Long)=
+        object : CountDownTimer(initialMillis, 1000L){
+            override fun onTick(p0: Long) {
+                updateTime(p0)
+                updateSeekbar(p0)
+            }
+
+            override fun onFinish() {
+                completeTimer()
+            }
+        }
+
+
+? 언제 각 상태들이 불리는지
+timerSeekBar.setOnSeekBarChangeListener(
+            object : SeekBar.OnSeekBarChangeListener{
+                override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onStartTrackingTouch(p0: SeekBar?) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onStopTrackingTouch(p0: SeekBar?) {
+                    timerSeekBar ?: return
+
+                    if (timerSeekBar.progress == 0){
+                        stopTimer()
+                    }
+                    else {
+                        startTimer()
+                    }
+                }
+            }
+        )
+
+! 
+onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
+Notification that the progress level has changed.
+
+onStartTrackingTouch(SeekBar seekBar)
+Notification that "the user" has started a touch gesture.
+
+onStopTrackingTouch(SeekBar seekBar)
+Notification that "the user" has finished a touch gesture.
+
+
+!
+    <SeekBar
+        android:id="@+id/seekBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:max="60"
+        android:progressDrawable="@color/transparent"
+        android:thumb="@drawable/ic_thumb"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/remainMinutesTextView"
+        app:tickMark="@drawable/drawable_tick_mark" />
+
+
+? 시크바에서 thumb가 배경 틱과 안맞다가 바꾸니까 됨
+andorid:tickMark
+app:tickMark
+
+
+
+! 소리 파일과 같은 리소스는 드로어블 밑 파일명을 raw로 해서 넣는다
+
+! 음악 파일 리소스를 사용하려면 빌더를 거쳐서 수행한다.
+ private val soundPool = SoundPool.Builder().build()
+private var tickingSoundID:Int? = null
+    private var bellSoundID:Int? = null
+
+        tickingSoundID = soundPool.load(this, R.raw.timer_ticking, 1)
+        bellSoundID = soundPool.load(this, R.raw.timer_bell, 1)
+
+        tickingSoundID?.let{ soundId->
+            soundPool.play(soundId, 1F, 1F, 0, -1, 1F)
+        }
