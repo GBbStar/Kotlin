@@ -2403,3 +2403,67 @@ private var tickingSoundID:Int? = null
         tickingSoundID?.let{ soundId->
             soundPool.play(soundId, 1F, 1F, 0, -1, 1F)
         }
+
+
+! 버튼이나 다른 위젯들을 프로젝트에 맞게 디자인 및 사용하려면 기존 위젯을 상속받는 별도의 위젯 클래스를 새로 만들어줘야 함
+! 이때 위젯들은 보통 context, attributeSet을 가지고 간다
+package fastcampus.aop.part2.chapter07
+
+import android.content.Context
+import android.util.AttributeSet
+import androidx.appcompat.widget.AppCompatImageButton
+
+class RecordButton(
+    context: Context,
+    attrs: AttributeSet
+) : AppCompatImageButton(context, attrs) {
+
+    init {
+        setBackgroundResource(R.drawable.shape_oval_button)
+    }
+
+    fun updateIconWithState(state: State) {
+        when (state) {
+            State.BEFORE_RECORDING -> {
+                setImageResource(R.drawable.ic_record)
+            }
+            State.ON_RECORDING -> {
+                setImageResource(R.drawable.ic_stop)
+            }
+            State.AFTER_RECORDING -> {
+                setImageResource(R.drawable.ic_play)
+            }
+            State.ON_PLAYING -> {
+                setImageResource(R.drawable.ic_stop)
+            }
+        }
+    }
+}
+
+
+! 쓰레드와 핸들러를 사용한 타이머
+    private val countUpAction:Runnable = object:Runnable {
+        override fun run() {
+            val currentTimeStamp = SystemClock.elapsedRealtime()
+            val countTimeSeconds = ((currentTimeStamp-startTimeStamp)/1000L).toInt()
+
+            updateCountTime(countTimeSeconds)
+
+            handler?.postDelayed(this, 1000L)
+        }
+    }
+
+
+? 무슨 동작
+handler?.removeCallbacks(countUpAction)
+
+
+! 프로젝트가 동작하는 상태를 구분할 때 enum 클래스로 정의하고 하면 편함
+package fastcampus.aop.part2.chapter07
+
+enum class State {
+    BEFORE_RECORDING,
+    ON_RECORDING,
+    AFTER_RECORDING,
+    ON_PLAYING
+}
